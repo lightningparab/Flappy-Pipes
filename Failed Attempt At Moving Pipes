@@ -23,11 +23,11 @@ SCREEN_HEIGHT = 600
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.Surface((50, 250))
+        self.surf = pygame.Surface((50, 500))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(
             center =(
-                SCREEN_HEIGHT,
+                SCREEN_WIDTH,
                 0)
             )
     def update(self, pressed_keys):
@@ -39,15 +39,15 @@ class Player(pygame.sprite.Sprite):
             self.rect.left = 0
         if self.rect.right > SCREEN_WIDTH:
             self.rect.right = SCREEN_WIDTH
-        if self.rect.top <= 0:
-            self.rect.top = 0
-        if self.rect.bottom >= 250:
-            self.rect.bottom = 250
+        if self.rect.top <= -500:
+            self.rect.top = -500
+        if self.rect.bottom >= 500:
+            self.rect.bottom = 500
 
 class Player2(pygame.sprite.Sprite):
     def __init__(self):
         super(Player2, self).__init__()
-        self.surftop = pygame.Surface((50, 250))
+        self.surftop = pygame.Surface((50, 500))
         self.surftop.fill((255, 255, 255))
         self.rect = self.surftop.get_rect(
             center =(
@@ -69,10 +69,10 @@ class Player2(pygame.sprite.Sprite):
             self.rect.left = 0
         if self.rect.right > SCREEN_WIDTH:
             self.rect.right = SCREEN_WIDTH
-        if self.rect.top <= 0:
-            self.rect.top = 0
-        if self.rect.bottom >= SCREEN_HEIGHT:
-            self.rect.bottom = SCREEN_HEIGHT
+        if self.rect.top <= 100:
+            self.rect.top = 100
+        if self.rect.bottom >= 600 + 500:
+            self.rect.bottom = 600 + 500
  #   def autoleft(self, moveleft):
   #      self.rect.move_ip(0, -1)
         
