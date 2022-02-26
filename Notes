@@ -19,6 +19,7 @@ from pygame.locals import (
     K_LEFT,
     K_RIGHT,
     K_ESCAPE,
+    K_p,
     KEYDOWN,
     QUIT,
 )
@@ -138,6 +139,7 @@ class Player2(pygame.sprite.Sprite):
 
 
 
+    
 
 # Initialize pygame
 pygame.init()
@@ -154,7 +156,8 @@ player2 = Player2()
 # Variable to keep the main loop running
 running = True
 moving = True
-
+paused = False
+    
     
 # Main loop
 while running:
@@ -168,12 +171,20 @@ while running:
             if event.key == K_ESCAPE:
                 running = False
                 moving = False
-            
+                
+            elif event.key == K_p:
+                player.rectB.center = player.rect.center
+                player2.rectB.center = player2.rect.center
+                paused = not paused
+                # toggle paused
+                
+                
         # Check for QUIT event. If QUIT, then set running to false.
         elif event.type == QUIT:
             running = False
             moving = False
      
+        
 
 
         
@@ -182,10 +193,10 @@ while running:
     # Get all the keys currently pressed
     pressed_keys = pygame.key.get_pressed()
 
-
-    # Update the player sprite based on user keypresses
-    player.update(pressed_keys)
-    player2.update(pressed_keys)
+    if not paused:
+        # Update the player sprite based on user keypresses
+        player.update(pressed_keys)
+        player2.update(pressed_keys)
     
     # Fill the screen with black
     screen.fill((126, 219, 242))
@@ -205,9 +216,10 @@ while running:
 
     pygame.display.flip()
     
-    player2.rect.move_ip(-4, 0)
-    player.rect.move_ip(-4, 0)
-    clock.tick(30)
+    if not paused:
+        player2.rect.move_ip(-4, 0)
+        player.rect.move_ip(-4, 0)
+        clock.tick(30)
 
 pygame.quit()
 ***************************************************************************************
