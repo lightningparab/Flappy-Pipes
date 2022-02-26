@@ -141,6 +141,12 @@ while running:
     
     player2.rect.move_ip(-4, 0)
     player.rect.move_ip(-4, 0)
+    if player.rect.left < 0:
+        player.rect.right = SCREEN_WIDTH
+    if player2.rect.left < 0:
+            player2.rect.right = SCREEN_WIDTH
+            
+
     clock.tick(30)
 
 pygame.quit()
