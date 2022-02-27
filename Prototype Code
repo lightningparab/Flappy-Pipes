@@ -1,16 +1,14 @@
 import time
+import random
 
 # Import the pygame module
 import pygame
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
-import random
 from pygame.locals import (
     K_UP,
     K_DOWN,
-    K_LEFT,
-    K_RIGHT,
     K_ESCAPE,
     K_p,
     K_y,
@@ -57,7 +55,7 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__()
         
         # Pipe border
-        self.surfB = pygame.Surface((52, 502))
+        self.surfB = pygame.Surface((52, 402))
         self.surfB.fill((0, 0, 0))
         self.rectB = self.surfB.get_rect(
             center =(
@@ -66,7 +64,7 @@ class Player(pygame.sprite.Sprite):
             )
         
         # Pipe
-        self.surf = pygame.Surface((50, 500))
+        self.surf = pygame.Surface((50, 400))
         self.surf.fill((17, 168, 42))
         self.rect = self.surf.get_rect(
             center =(
@@ -93,10 +91,10 @@ class Player(pygame.sprite.Sprite):
         #    self.rect.right = SCREEN_WIDTH
         if self.rect.right <= 0:
             self.rect.left = SCREEN_WIDTH
-        if self.rect.top <= -500:
-            self.rect.top = -500
-        if self.rect.bottom >= 500:
-            self.rect.bottom = 500
+        if self.rect.top <= -400:
+            self.rect.top = -400
+        if self.rect.bottom >= 400:
+            self.rect.bottom = 400
         
         if self.rectB.center != self.rect.center:
             self.rectB.center = self.rect.center
@@ -106,7 +104,7 @@ class Player2(pygame.sprite.Sprite):
         super(Player2, self).__init__()
         
         # Pipe border
-        self.surftopB = pygame.Surface((52, 502))
+        self.surftopB = pygame.Surface((52, 402))
         self.surftopB.fill((0, 0, 0))
         self.rectB = self.surftopB.get_rect(
             center =(
@@ -115,7 +113,7 @@ class Player2(pygame.sprite.Sprite):
             )
         
         # Pipe
-        self.surftop = pygame.Surface((50, 500))
+        self.surftop = pygame.Surface((50, 400))
         self.surftop.fill((17, 168, 42))
         self.rect = self.surftop.get_rect(
             center =(
@@ -140,10 +138,10 @@ class Player2(pygame.sprite.Sprite):
         #    self.rect.left = 0
         if self.rect.right <= 0:
             self.rect.left = SCREEN_WIDTH
-        if self.rect.top <= 100:
-            self.rect.top = 100
-        if self.rect.bottom >= 600 + 500:
-            self.rect.bottom = 600 + 500
+        if self.rect.top <= 200:
+            self.rect.top = 200
+        if self.rect.bottom >= 600 + 400:
+            self.rect.bottom = 600 + 400
             
         if self.rectB.center != self.rect.center:
             self.rectB.center = self.rect.center
@@ -164,17 +162,26 @@ class Bird(pygame.sprite.Sprite):
         )
         self.speed = 0
 
-    # Move the sprite based on speed
-    # Remove the sprite when it passes the left edge of the screen
+    # Move the bird based on speed
     def update(self, displacement):
-        if displacement >= 0:
-            self.speed = 9
+        if displacement > 0:
+            self.speed = random.randint(-3, 8) * 10 / 2
+        elif displacement < 0:
+            self.speed = random.randint(-3, 8) * -10 / 2
         else:
-            self.speed = -9
+            self.speed = 0
         self.rect.move_ip(0, self.speed)
-        if (self.rect.right >= player.rect.left) or (self.rect.right >= player2.rect.left):
-            self.kill()
+        
 
+def youLose():
+    bird.kill()
+    text = font.render('You lose!', True, black, white)
+    textRect = text.get_rect()
+    textRect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    screen.blit(text, textRect)
+    pygame.display.update()
+    time.sleep(5)
+    pygame.quit()
 
 
 # Initialize pygame
@@ -286,6 +293,18 @@ if doIntro:
 # END intro
 
 
+# begin counter
+counter = 0
+surftest = pygame.Surface((500, 500))
+surftest.fill((255, 255, 255))
+rect = surftest.get_rect()
+
+
+
+counter, text = 30, '30'.rjust(3)
+pygame.time.set_timer(pygame.USEREVENT, 1000)
+font = pygame.font.SysFont('Comic', 30)
+# end counter
 
 running = True
 # Main loop
@@ -294,8 +313,12 @@ while running:
     
     for event in pygame.event.get():
         
+        if event.type == pygame.USEREVENT: 
+            counter -= 1
+            text = str(counter).rjust(3) if counter > -1 else youLose()
+        
         # Check for KEYDOWN event
-        if event.type == KEYDOWN:
+        elif event.type == KEYDOWN:
             # If the Esc key is pressed, then exit the main loop
             if event.key == K_ESCAPE:
                 running = False
@@ -360,7 +383,7 @@ while running:
         player.rect.move_ip(-4, 0)
         
         # update bird movement
-        displacement = (player.rect.bottom + 50) - (bird.rect.top + 28)
+        displacement = (player.rect.bottom + 100) - (bird.rect.top + 28)
         bird.update(displacement)
         
         clock.tick(30)
@@ -378,6 +401,11 @@ while running:
         screen.blit(text, textRect)
         pygame.display.update()
         time.sleep(5)
-        running = False
+        pygame.quit()
+        
+        
+    screen.blit(font.render(text, True, (0, 0, 0)), (32, 48))
+    pygame.display.flip()
+    clock.tick(60)
 
 pygame.quit()
