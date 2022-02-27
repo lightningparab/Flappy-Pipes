@@ -20,17 +20,7 @@ from pygame.locals import (
 )
 
 
-bird_max_upward_angle = 35
-bird_max_downward_angle = -90
-bird_min_incremental_angle = 5
-bird_angular_acceleration = 0.3
-bird_jump_velocity = -8
-bird_acceleration = 3
-bird_max_displacement = 12
-bird_starting_x_position = 75
-bird_starting_y_position = 300
-
-
+displacement = 0
 
 
 clock = pygame.time.Clock()
@@ -159,13 +149,33 @@ class Player2(pygame.sprite.Sprite):
             self.rectB.center = self.rect.center
 
 
-speed = 2
-class Bird:
-    
-    def move_towards_gap(self, player):
-        dy = player.rect.y - self.rect.y
-        self.rect.y += dy * speed
-    
+
+# Define the enemy object by extending pygame.sprite.Sprite
+# The surface you draw on the screen is now an attribute of 'enemy'
+class Bird(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Bird, self).__init__()
+        self.surf = pygame.Surface((60, 56))
+        self.rect = self.surf.get_rect(
+            center=(
+                75,
+                300
+            )
+        )
+        self.speed = 0
+
+    # Move the sprite based on speed
+    # Remove the sprite when it passes the left edge of the screen
+    def update(self, displacement):
+        if displacement >= 0:
+            self.speed = 9
+        else:
+            self.speed = -9
+        self.rect.move_ip(0, self.speed)
+        if (self.rect.right >= player.rect.left) or (self.rect.right >= player2.rect.left):
+            self.kill()
+
+
 
 # Initialize pygame
 pygame.init()
@@ -175,9 +185,10 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
-# Instantiate player. Right now, this is just a rectangle.
+# Instantiate player and bird
 player = Player()
 player2 = Player2()
+bird = Bird()
 
 # Variable to keep the main loop running
 running = False
@@ -312,8 +323,7 @@ while running:
         player.update(pressed_keys)
         player2.update(pressed_keys)
         
-        # Update bird based on gap y_pos
-        Bird.move_towards_gap((75 , player.rect.bottom + 50))
+        
     
     # Fill the screen with black
     screen.fill((126, 219, 242))
@@ -327,9 +337,6 @@ while running:
     # add ocean
     screen.blit(image2, (0, 400))
     
-    # add bird
-    screen.blit(image3, (75, 300))
-    
     # add sun
     screen.blit(image4, (675, 30))
     
@@ -342,11 +349,35 @@ while running:
     screen.blit(player2.surftop, player2.rect)
     screen.blit(player.surf, player.rect)
 
+    # add bird
+    screen.blit(image3, bird.rect)
+
+
     pygame.display.flip()
     
     if not paused:
         player2.rect.move_ip(-4, 0)
         player.rect.move_ip(-4, 0)
+        
+        # update bird movement
+        displacement = (player.rect.bottom + 50) - (bird.rect.top + 28)
+        bird.update(displacement)
+        
         clock.tick(30)
+      
+        
+    pipes = pygame.sprite.Group()
+    pipes.add(player)
+    pipes.add(player2)
+    
+    if pygame.sprite.spritecollideany(bird, pipes):
+        bird.kill()
+        text = font.render('You win!', True, black, white)
+        textRect = text.get_rect()
+        textRect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        screen.blit(text, textRect)
+        pygame.display.update()
+        time.sleep(5)
+        running = False
 
 pygame.quit()
